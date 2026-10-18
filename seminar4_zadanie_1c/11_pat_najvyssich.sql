@@ -1,0 +1,20 @@
+WITH ranked_items AS (
+    SELECT
+        invoice_no,
+        stock_code,
+        description,
+        quantity,
+        unit_price,
+        DENSE_RANK() OVER (
+            PARTITION BY invoice_no
+            ORDER BY unit_price DESC
+        ) AS price_rank
+    FROM retail_sales
+),
+filtered_items AS (
+    SELECT *
+    FROM ranked_items
+    WHERE price_rank <= 5
+)
+SELECT COUNT(*)
+FROM filtered_items;
